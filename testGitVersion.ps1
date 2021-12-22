@@ -1,25 +1,33 @@
 ﻿$executedCommandCounter = 0
 
+function WriteGitVersionYML ([Array]$gitversionyml) {
+
+    Add-Content -Path docu.md -Value "## GitVersion.yml`n"
+
+    Add-Content -Path docu.md -Value "``````yml"
+    Add-Content -Path docu.md -Value $gitversionyml    
+    Add-Content -Path docu.md -Value "``````"
+} 
 function WriteCommandLineParts ([Array]$parts) {
 
-    Add-Content -Path docu.md -Value "``````log"
+    Add-Content -Path docu.md -Value "## Executed commands`n"
 
+    Add-Content -Path docu.md -Value "``````log"
     foreach ($part in $parts) {
         Add-Content -Path docu.md -Value $part
     }
-    
     Add-Content -Path docu.md -Value "``````"
 } 
 function WriteGitVersionOutput ($output) {
 
-    Add-Content -Path docu.md -Value "``````json"
+    Add-Content -Path docu.md -Value "## gitversion output`n"
 
-    $outputProperties = "SemVer", "FullSemVer", "NuGetVersion"
-    # $outputProperties = "*"
+    # $outputProperties = "SemVer", "FullSemVer", "NuGetVersion"
+    $outputProperties = "*"
     $newOutput = $output | ConvertFrom-Json | Select-Object $outputProperties | ConvertTo-Json
     
+    Add-Content -Path docu.md -Value "``````json"
     Add-Content -Path docu.md -Value $newOutput
-    
     Add-Content -Path docu.md -Value "``````"
 } 
 
@@ -45,6 +53,8 @@ $gitCommands = "git init|git add .|git commit -m `"initial commit`"",
                "touch release0.0.2_1.txt|git add .|git commit -m `"hotfix release0.0.2_1`"|git tag v0.0.2",
                "git checkout develop|git merge release/0.0.2", 
                "git checkout master|git merge release/0.0.2"
+
+WriteGitVersionYML $(Get-Content -Path GitVersion.yml)
 
 foreach ($command in $gitCommands) {
 	$parts = $command.Split("|")
